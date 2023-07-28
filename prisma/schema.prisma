@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//User model
+model User {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  userName  String     @unique
+  firstname String?
+  lastname  String?
+  password  String
+  cocktails Cocktail[]
+}
+
+model Cocktail {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  name        String   @db.VarChar(255)
+  //cocktail needs to belong to a single user, 1 to many
+  belongsToId String
+  belongsTo   User     @relation(fields: [belongsToId], references: [id])
+
+  build       String  @db.VarChar(255)
+  asset       String? //picture url for cocktail
+  ingredients Json?
+
+  @@unique([id, belongsToId])
+}
